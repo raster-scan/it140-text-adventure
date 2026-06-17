@@ -1,5 +1,6 @@
 # Randy Cornetta
 # IT 140 Project Two - Text Based Game
+# Updated 6/16/26
 
 def show_instructions():
     """Display the game title, goal, and available commands."""
