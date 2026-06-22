@@ -1,20 +1,21 @@
 # Randy Cornetta
-# IT 140 Project Two - Text Based Game
-# Updated 6/16/26
+# IT 140 Project - Text Based Game
+# Updated 6/21/26
 
 def show_instructions():
-    """Display the game title, goal, and available commands."""
+    #Display the game title, goal, and available commands.
     print("IT Support Escape Game")
     print("Collect all 6 IT items before entering the Server Room.")
     print("If you enter the Server Room before collecting all items, System Crash wins.")
     print()
     print("Move commands: go North, go South, go East, go West")
-    print("Get item command: get item name")
+    print("Get item command: Get <item name>")
+    print("Example: Get Diagnostic Cable")
     print("-" * 50)
 
 
 def show_status(current_room, inventory, rooms):
-    """Display the player's current room, room description, inventory, and room item."""
+    #Display the player's current room, room description, inventory, and room item.
     print()
     print("You are in the", current_room)
     print(rooms[current_room]["description"])
@@ -37,7 +38,7 @@ def show_status(current_room, inventory, rooms):
 
 
 def main():
-    """Run the main gameplay loop."""
+    #Run the main gameplay loop.
     rooms = {
         "Front Entrance": {
             "North": "Help Desk",
