@@ -1,25 +1,29 @@
 # Randy Cornetta
-
 # IT 140 Project - Text Based Game
-# Updated 6/21/26
+# Updated version with normalized user input
+# Fixed a game over bug
+# Update 6/23/26
+
 
 def show_instructions():
-    #Display the game title, goal, and available commands.
+    # Display the game title, goal, and available commands.
     print("IT Support Escape Game")
     print("Collect all 6 IT items before entering the Server Room.")
     print("If you enter the Server Room before collecting all items, System Crash wins.")
     print()
     print("Move commands: go North, go South, go East, go West")
-    print("Get item command: Get <item name>")
-    print("Example: Get Diagnostic Cable")
+    print("Get item command: get <item name>")
+    print("Example: get Diagnostic Cable")
+    print("Type exit to quit the game.")
     print("-" * 50)
 
 
 def show_status(current_room, inventory, rooms):
-    #Display the player's current room, room description, inventory, and room item.
+    # Display the player's current room, room description, inventory, and room item.
     print()
     print("You are in the", current_room)
     print(rooms[current_room]["description"])
+
     print("Available directions:",
           ", ".join(direction for direction in rooms[current_room]
                     if direction not in ["item", "description"]))
@@ -39,7 +43,7 @@ def show_status(current_room, inventory, rooms):
 
 
 def main():
-    #Run the main gameplay loop.
+    # Run the main gameplay loop.
     rooms = {
         "Front Entrance": {
             "North": "Help Desk",
@@ -98,40 +102,63 @@ def main():
     while not game_over:
         show_status(current_room, inventory, rooms)
 
-        command = input("Enter your move: ").strip().title()
+        # Store the original input, then normalize a copy for command checking.
+        command = input("Enter your move: ").strip()
+        normalized_command = command.lower()
 
         # Validate blank input before checking for commands.
-        if command == "":
+        if normalized_command == "":
             print("Please enter a command.")
 
+        # Let the player quit the game.
+        elif normalized_command == "exit":
+            print("Thanks for playing the game. Hope you enjoyed it.")
+            game_over = True
+
         # Validate a bare go command with no direction.
-        elif command == "Go":
+        elif normalized_command == "go":
             print("Please enter a direction after go.")
 
         # Handle movement commands.
-        elif command.startswith("Go "):
-            direction = command[3:]
+        elif normalized_command.startswith("go "):
+            direction_input = normalized_command[3:].strip()
 
-            if direction in rooms[current_room]:
-                current_room = rooms[current_room][direction]
+            valid_move = None
+            for direction in rooms[current_room]:
+                if direction.lower() == direction_input:
+                    valid_move = direction
+
+            if valid_move is not None:
+                current_room = rooms[current_room][valid_move]
+
+                # Check for win/lose immediately upon entering a new room
+                if current_room == villain_room:
+                    if len(inventory) == required_items:
+                        print()
+                        print("Congratulations! You collected all items and stopped System Crash!")
+                    else:
+                        print()
+                        print("System Crash was too strong. GAME OVER!")
+                    print("Thanks for playing the game. Hope you enjoyed it.")
+                    game_over = True
             else:
                 print("You cannot go that way!")
 
         # Validate a bare get command with no item.
-        elif command == "Get":
+        elif normalized_command == "get":
             print("Please enter an item name after get.")
 
         # Handle item collection commands.
-        elif command.startswith("Get "):
-            item_name = command[4:]
+        elif normalized_command.startswith("get "):
+            item_name = command[4:].strip()
 
             if "item" in rooms[current_room]:
                 room_item = rooms[current_room]["item"]
 
-                if item_name == room_item:
+                if item_name.lower() == room_item.lower():
                     inventory.append(room_item)
                     del rooms[current_room]["item"]
-                    print(room_item, "retrieved!")
+                    print(f"{room_item} retrieved!")  # Uses official item name casing
                 else:
                     print("Cannot get that item!")
             else:
@@ -141,18 +168,6 @@ def main():
         else:
             print("Invalid command!")
 
-        # Check for the win or lose condition after each command.
-        if current_room == villain_room:
-            if len(inventory) == required_items:
-                print()
-                print("Congratulations! You collected all items and stopped System Crash!")
-                print("Thanks for playing the game. Hope you enjoyed it.")
-            else:
-                print()
-                print("System Crash was too strong. GAME OVER!")
-                print("Thanks for playing the game. Hope you enjoyed it.")
-
-            game_over = True
-
-
-main()
+# Added the dunder name to be more inline with Python standards
+if __name__ == "__main__":
+    main()
